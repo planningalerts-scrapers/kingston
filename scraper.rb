@@ -3,37 +3,59 @@ require 'rubygems'
 require 'mechanize'
 require 'date'
 
-agent = Mechanize.new
+use_cache = false
+cache_fn = "cache.html"
+url = "http://www.kingston.vic.gov.au/Planning-and-Building/Planning/Advertised-Planning-Applications"
 
-# Get the last two weeks of data
+if use_cache and File.exist?(cache_fn)
+  body = ""
+  File.open(cache_fn, 'r') {|f| body = f.read() }
+  page = Nokogiri(body)
+else
+  agent = Mechanize.new
+  page = agent.get(url)
+  File.open(cache_fn, 'w') {|f| f.write(page.body) }
+end
 
-start_date = (Date.today-14).strftime('%d/%m/%Y')
-end_date = Date.today.strftime('%d/%m/%Y')
+content = page.search('div.bodyContent')[0]
+found = false
+content.search('p').each do |entry|
+  next unless entry.inner_text =~ /\AKP\d+/
+  found = true
 
-url = "http://web.kingston.vic.gov.au/web/planning/?l=planning_register2&l1=#{start_date}&l2=#{end_date}&l3=lodged&i=&x=&c=&w="
-page = agent.get(url)
+  # <p> contains reference and address.
+  council_reference, address = entry.inner_text.split(" - ", 2)
+  # "No. 1 - No. 2 Example Road, Suburb:"
+  address.sub!(/\ANo\. /, '')
+  address.sub!(/ - No. /, '-')
+  address.sub!(/:\Z/, '')
+  # "Shop 1, No. 23 Example Road"
+  address.sub!(/, No\. /, ', ')
 
-page.search('tr.item_row').each do |row|
-  values = row.search('td a').map{|a| a.inner_text}
-  url = row.at('td a')['href']
-  record = {
-    'description'       => values[7],
-    'council_reference' => values[0],
-    'address'           => values[2] + ", " + values[3] + ", VIC",
-    'date_received'     => Date.parse(values[1], "%d-%M-&y").to_s,
-    'info_url'          => (page.uri + url).to_s,
-    'comment_url'       => "http://www.kingston.vic.gov.au/Page/Page.asp?Page_Id=34&h=-1",
-    'date_scraped'      => Date.today.to_s,
-  }
-  # On notice information isn't always there
-  if values[4] != ""
-    record["on_notice_from"] = Date.parse(values[4], "%d-%M-&y").to_s
+  # <p> is followed by a list of links to PDFs.
+  ul = entry.next_element
+  raise "Expected <ul> following " + council_reference unless ul.name == "ul"
+  links = ul.search('a').map do |a|
+    "http://www.kingston.vic.gov.au" + a.attribute('href')
   end
 
-  if ScraperWiki.select("* from data where `council_reference`='#{record['council_reference']}'").empty? 
+  record = {
+    'description'       => "See links:\n" + links.join("\n"),
+    'council_reference' => council_reference,
+    'address'           => address + ", VIC",
+    # These are regularly 10MB PDFs, so link to the index page in case the user clicks on it.
+    'info_url'          => url,
+    'comment_url'       => "mailto:info@kingston.vic.gov.au?Subject=Planning+application+" + council_reference,
+    'date_scraped'      => Date.today.to_s,
+  }
+
+  if (ScraperWiki.select("* from data where `council_reference`='#{record['council_reference']}'").empty? rescue true)
     ScraperWiki.save_sqlite(['council_reference'], record)
   else
     puts "Skipping already saved record " + record['council_reference']
   end
 end
 
+if not found
+  raise "No entries found."
+end
