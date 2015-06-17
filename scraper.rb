@@ -4,6 +4,7 @@ require 'mechanize'
 require 'date'
 
 cache_fn = "cache.html"
+url = "http://www.kingston.vic.gov.au/Planning-and-Building/Planning/Advertised-Planning-Applications"
 
 if File.exist?(cache_fn)
   body = ""
@@ -11,7 +12,6 @@ if File.exist?(cache_fn)
   page = Nokogiri(body)
 else
   agent = Mechanize.new
-  url = "http://www.kingston.vic.gov.au/Planning-and-Building/Planning/Advertised-Planning-Applications"
   page = agent.get(url)
   File.open(cache_fn, 'w') {|f| f.write(page.body) }
 end
@@ -47,7 +47,8 @@ content.search('p').each do |entry|
     'description'       => "See links:\n" + links.join("\n"),
     'council_reference' => council_reference,
     'address'           => address + ", VIC",
-    'info_url'          => links[0],
+    # These are regularly 10MB PDFs, so link to the index page in case the user clicks on it.
+    'info_url'          => url,
     'comment_url'       => "mailto:info@kingston.vic.gov.au?Subject=Planning+application+" + council_reference,
     'date_scraped'      => Date.today.to_s,
   }
