@@ -3,10 +3,11 @@ require 'rubygems'
 require 'mechanize'
 require 'date'
 
+use_cache = false
 cache_fn = "cache.html"
 url = "http://www.kingston.vic.gov.au/Planning-and-Building/Planning/Advertised-Planning-Applications"
 
-if File.exist?(cache_fn)
+if use_cache and File.exist?(cache_fn)
   body = ""
   File.open(cache_fn, 'r') {|f| body = f.read() }
   page = Nokogiri(body)
@@ -19,9 +20,7 @@ end
 content = page.search('div.bodyContent')[0]
 found = false
 content.search('p').each do |entry|
-  if not entry.inner_text =~ /\AKP\d+/
-    next
-  end
+  next unless entry.inner_text =~ /\AKP\d+/
   found = true
 
   # <p> contains reference and address.
@@ -35,12 +34,9 @@ content.search('p').each do |entry|
 
   # <p> is followed by a list of links to PDFs.
   ul = entry.next_element
-  if ul.name != "ul"
-    raise "Expected <ul> following " + council_reference
-  end
-  links = []
-  ul.search('a').each do |a|
-    links.push("http://www.kingston.vic.gov.au" + a.attribute('href'))
+  raise "Expected <ul> following " + council_reference unless ul.name == "ul"
+  links = ul.search('a').map do |a|
+    "http://www.kingston.vic.gov.au" + a.attribute('href')
   end
 
   record = {
