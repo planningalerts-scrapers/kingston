@@ -45,7 +45,7 @@ $term_url = "https://online.kingston.vic.gov.au/ePathway/Production/Web/GeneralE
 $user_agent = "User-Agent:Mozilla/5.0 (Windows NT 6.1; WOW64) PlanningAlerts.org.au";
 
 $da_page = $url_base . "EnquirySummaryView.aspx?SortFieldNumber=5&SortDirection=Descending";
-$comment_base = "mailto:info@kingston.vic.gov.au?subject=Development Application - ";
+$comment_base = "mailto:info@kingston.vic.gov.au";
 
 $cookies = accept_terms_get_cookies($term_url, "Next", array('mDataGrid:Column0:Property' => 'ctl00$MainBodyContent$mDataList$ctl01$mDataGrid$ctl02$ctl00'));
 
@@ -78,7 +78,7 @@ foreach ($dataset as $record) {
         'address'           => $address,
         'description'       => preg_replace('/\s+/', ' ', trim(html_entity_decode($record->find('td', 3)->plaintext))),
         'info_url'          => $term_url,
-        'comment_url'       => $comment_base . trim(html_entity_decode($record->find('a',0)->plaintext)),
+        'comment_url'       => $comment_base,
         'date_scraped'      => date('Y-m-d'),
         'date_received'     => $date_received
     );
