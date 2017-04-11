@@ -62,7 +62,7 @@ for ($i = 1; $i < $totalNum; $i++) {
         $existingRecords = scraperwiki::select("* from data where `council_reference`='" . $record['council_reference'] . "'");
         if ( count($existingRecords) == 0 ) {
             print ("Saving record " . $record['council_reference'] . " - " . $record['address'] ."\n");
-            print_r ($record);
+//            print_r ($record);
             scraperwiki::save(array('council_reference'), $record);
             $recordSaved++;
         } else {
