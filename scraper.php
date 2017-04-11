@@ -55,7 +55,7 @@ for ($i = 1; $i < $totalNum; $i++) {
             'info_url'          => $url_base . "/EnquiryLists.aspx",
             'comment_url'       => $comment_url,
             'date_scraped'      => date('Y-m-d'),
-            'date_received'     => $date_received
+            'date_received'     => date('Y-m-d', strtotime($date_received))
         ];
 
         # Check if record exist, if not, INSERT, else do nothing
