@@ -35,7 +35,6 @@ for ($i = 1; $i < $totalNum; $i++) {
 
     $applications = $dom->find("tr[class=ContentPanel], tr[class=AlternateContentPanel]");
 
-    $recordSaved = 0;
     # The usual, look for the data set and if needed, save it
     foreach ($applications as $application) {
         # Slow way to transform the date but it works
@@ -58,25 +57,9 @@ for ($i = 1; $i < $totalNum; $i++) {
             'date_received'     => date('Y-m-d', strtotime($date_received))
         ];
 
-        # Check if record exist, if not, INSERT, else do nothing
-        $existingRecords = scraperwiki::select("* from data where `council_reference`='" . $record['council_reference'] . "'");
-        if ( count($existingRecords) == 0 ) {
-            print ("Saving record " . $record['council_reference'] . " - " . $record['address'] ."\n");
+        print ("Saving record " . $record['council_reference'] . " - " . $record['address'] ."\n");
 //            print_r ($record);
-            scraperwiki::save(array('council_reference'), $record);
-            $recordSaved++;
-        } else {
-            print ("Skipping already saved record - " . $record['council_reference'] . "\n");
-        }
-    }
-
-    /* Well, a work around since it has few hundred pages to scan,
-     * if there are 10 pages of information already saved. Assuming
-     * the rest are already saved. So it is time to stop the loop
-     */
-    $nothingSaved = $recordSaved >= 1 ? 0 : $nothingSaved+1;
-    if ($nothingSaved >= 10) {
-        $i = $totalNum + 1;
+        scraperwiki::save(array('council_reference'), $record);
     }
 }
 
