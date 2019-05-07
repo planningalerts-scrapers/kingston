@@ -4,7 +4,7 @@ require_once 'vendor/autoload.php';
 require_once 'vendor/openaustralia/scraperwiki/scraperwiki.php';
 
 use PGuardiario\PGBrowser;
-use Sunra\PhpSimple\HtmlDomParser;
+use Torann\DomParser\HtmlDom;
 
 date_default_timezone_set('Australia/Sydney');
 
@@ -16,12 +16,12 @@ $comment_url = "mailto:info@kingston.vic.gov.au";
 $browser = new PGBrowser();
 $page = $browser->get($url_base . "/EnquiryLists.aspx");
 $form = $page->form();
-$form->set('mDataGrid:Column0:Property', 'ctl00$MainBodyContent$mDataList$ctl02$mDataGrid$ctl02$ctl00');
+$form->set('mDataGrid:Column0:Property', 'ctl00$MainBodyContent$mDataList$ctl03$mDataGrid$ctl02$ctl00');
 $form->set('ctl00$MainBodyContent$mContinueButton', 'Next');
 $page = $form->submit();
 
 $page = $browser->get($da_url . "&PageNumber=1");
-$dom = HtmlDomParser::str_get_html($page->html);
+$dom = HtmlDom::fromString($page->html);
 
 $totalNum = $dom->find("span[id=ctl00_MainBodyContent_mPagingControl_pageNumberLabel]")[0];
 $totalNum = explode(" of ", trim($totalNum->plaintext));
@@ -31,7 +31,7 @@ $nothingSaved = 0;
 for ($i = 1; $i < $totalNum; $i++) {
     print ("Scraping page " .$i. " of " .$totalNum. "\n");
     $page  = $browser->get($da_url . "&PageNumber=" . $i);
-    $dom   = HtmlDomParser::str_get_html($page->html);
+    $dom   = HtmlDom::fromString($page->html);
 
     $applications = $dom->find("tr[class=ContentPanel], tr[class=AlternateContentPanel]");
 
