@@ -9,7 +9,7 @@ use Torann\DomParser\HtmlDom;
 date_default_timezone_set('Australia/Sydney');
 
 $url_base    = "https://online.kingston.vic.gov.au/ePathway/Production/Web/GeneralEnquiry";
-$da_url      = $url_base . "/EnquirySummaryView.aspx?SortFieldNumber=5&SortDirection=Descending";
+$da_url      = $url_base . "/EnquirySummaryView.aspx?SortFieldNumber=0&SortDirection=Ascending";
 $comment_url = "mailto:info@kingston.vic.gov.au";
 
 # Agreed Terms
