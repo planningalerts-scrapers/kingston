@@ -2,3 +2,5 @@
 data.sqlite
 vendor
 
+results_original.yml
+results_ruby.yml
