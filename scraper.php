@@ -10,7 +10,6 @@ date_default_timezone_set('Australia/Sydney');
 
 $url_base    = "https://online.kingston.vic.gov.au/ePathway/Production/Web/GeneralEnquiry";
 $da_url      = $url_base . "/EnquirySummaryView.aspx?SortFieldNumber=5&SortDirection=Descending";
-$comment_url = "mailto:info@kingston.vic.gov.au";
 
 # Agreed Terms
 $browser = new PGBrowser();
@@ -56,7 +55,6 @@ for ($i = 1; $i < $totalNum; $i++) {
             'address'           => $address,
             'description'       => preg_replace('/\s+/', ' ', trim(html_entity_decode($application->find('td', 3)->plaintext))),
             'info_url'          => $url_base . "/EnquiryLists.aspx",
-            'comment_url'       => $comment_url,
             'date_scraped'      => date('Y-m-d'),
             'date_received'     => date('Y-m-d', strtotime($date_received))
         ];
