@@ -54,7 +54,7 @@ for ($i = 1; $i < $totalNum; $i++) {
             'council_reference' => trim(html_entity_decode($application->find('a',0)->plaintext)),
             'address'           => $address,
             'description'       => preg_replace('/\s+/', ' ', trim(html_entity_decode($application->find('td', 3)->plaintext))),
-            'info_url'          => $url_base . "/EnquiryLists.aspx",
+            'info_url'          => $url_base . "/EnquiryLists.aspx?ModuleCode=LAP",
             'date_scraped'      => date('Y-m-d'),
             'date_received'     => date('Y-m-d', strtotime($date_received))
         ];
