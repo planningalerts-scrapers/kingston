@@ -11,12 +11,6 @@ EpathwayScraper.scrape(
 ) do |record|
   # Add state on to the address
   record["address"] += ", VIC"
-  record["address"] = record["address"].squeeze(" ")
-  if record["address"] == ", VIC"
-    record["address"] = ", , VIC"
-  end
-  # Format the description like the php scraper
-  record["description"] = record["description"].gsub("\n", " ").squeeze(" ")
 
   EpathwayScraper.save(record)
 end
