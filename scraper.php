@@ -27,6 +27,10 @@ $totalNum = $dom->find("span[id=ctl00_MainBodyContent_mPagingControl_pageNumberL
 $totalNum = explode(" of ", trim($totalNum->plaintext));
 $totalNum = (int) $totalNum[1] > 1 ? intval($totalNum[1]) : intval(1);
 
+# Limit the total number of pages
+if ($totalNum > 10)
+  $totalNum = 10;
+
 $nothingSaved = 0;
 for ($i = 1; $i < $totalNum; $i++) {
     print ("Scraping page " .$i. " of " .$totalNum. "\n");
