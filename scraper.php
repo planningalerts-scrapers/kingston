@@ -57,9 +57,15 @@ for ($i = 1; $i < $totalNum; $i++) {
             'date_received'     => date('Y-m-d', strtotime($date_received))
         ];
 
-        print ("Saving record " . $record['council_reference'] . " - " . $record['address'] ."\n");
-//            print_r ($record);
-        scraperwiki::save(array('council_reference'), $record);
+        # Workaround to handle the council_reference changing. See
+        # https://github.com/planningalerts-scrapers/kingston/pull/5#issuecomment-492858423
+        if ($record['date_received'] > '2018-03-16') {
+          print ("Saving record " . $record['council_reference'] . " - " . $record['address'] ."\n");
+  //            print_r ($record);
+          scraperwiki::save(array('council_reference'), $record);
+        } else {
+          print "Skipping record " . $record['council_reference'] . " because it's too old\n";
+        }
     }
 }
 
